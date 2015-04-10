@@ -27,25 +27,24 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers', '
     .state('tab.map-index', {
       url: '/map',
       views: {
-        'map-tab': {
+        'tab-map': {
           templateUrl: 'templates/map-index.html',
           controller: 'MapIndexCtrl'
         }
       }
     })
 
-
     .state('tab.about', {
       url: '/about',
       views: {
-        'about-tab': {
+        'tab-about': {
           templateUrl: 'templates/about.html'
         }
       }
     });
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/map');
+  $urlRouterProvider.otherwise('/tab/about');
 
 });
 

@@ -1,3 +1,6 @@
 *.keystore
 *.sw*
 platforms/^.*
+.idea
+*.project
+*.log
