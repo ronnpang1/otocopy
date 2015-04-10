@@ -1,4 +1,4 @@
-ionic-angular-cordova-seed
+ionic-angular-cordova-leaflet-seed
 ==========================
 
 The perfect starting point for an Ionic project.
