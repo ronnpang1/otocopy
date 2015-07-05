@@ -1,5 +1,36 @@
 <ion-view title="Map">
-    <ion-content>
-        <leaflet defaults="map.defaults" center="map.center"></leaflet>
+	 <body ng-controller="MapIndexCtrl">
+  <ion-content data-tap-disabled="true">
+		 
+        <leaflet defaults="map.defaults"  center="map.center" markers="map.markers"  ng-if="map" height="400px"></leaflet>
+
+<form  ng-click="sendmsg()">
+
+  <label class="item item-input">
+  <span class="input-label">input  
+  </span>
+
+   <label class="item item-input" >
+    <textarea placeholder="Comments" cols="150" rows="3" ng-model="user.msg" > </textarea>
+  </label>
+  
+      <button class="button button-balanced" ng-click="send(user)"type = "submit">
+  send
+</button>
+ 
+<br>
+
+</label>
+   </form>
+	   
+	 
+
+<ion-list>
+      <ion-item ng-repeat="item in items" type="item-text-wrap" href="#/tab/friend/{{friend.id}}">
+        {{item.name}}
+      </ion-item>
+    </ion-list>
+
+	
     </ion-content>
 </ion-view>
