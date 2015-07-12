@@ -2,16 +2,52 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 
 
 // FUCK
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams',
   
-  function($scope, leafletData, $geolocation, $http,$state) 
+  
+  
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window) 
   {
-			
+  
+	
+		
+			$state.transitionTo($state.current, $stateParams, {
+    reload: true,
+    inherit: false,
+    notify: true
+});
+
+			$scope.layer='';
 			$scope.master = {};
-			$scope.lat=' ';
-			$scope.lng=' ';
+			$scope.lat= ' ';
+			$scope.lng= ' ';
 			$scope.rad=10;
-	  
+			
+		
+            
+			  $geolocation.get().then(function(position)
+			   {
+				   
+				   console.log(position.coords.latitude);
+				   $scope.map.center.lat=position.coords.latitude;
+				   $scope.map.center.lng=position.coords.longitude;
+				   $scope.lat=position.coords.latitude;
+				   $scope.lng=position.coords.longitude;
+				   coords = {};
+				   coords.lat=position.coords.latitude;
+				   coords.lng=position.coords.longitude;
+				   console.log(position);
+				   $scope.$apply();
+				  
+			   },function(err){
+			   console.log("cant parse mapdiv");
+			   console.log(err.message);
+			   });
+			
+			
+   
+			
+			
 	  $scope.send= function (user)
       {
 		$scope.master = angular.copy(user);
@@ -22,6 +58,9 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 		msg.rad=$scope.rad;
 		console.log(msg.rad+"RADIUS");
 		console.log(msg.text +msg.lat);
+		 leafletData.getMap().then(function(map) {
+		 map.removeLayer($scope.layer);
+		 });
 		$http.post('https://thawing-cliffs-9435.herokuapp.com/addmsg', msg).success(function(data){
 		console.log("good"+data
 			);
@@ -43,7 +82,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
           center:
 			  {
 			  lat : 45.32132,
-			  lng : -71.3231,
+			  lng : -73.352686,
 			  zoom:12
 			  },
          
@@ -58,30 +97,20 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
           
           
         };
+		
+		
+				
+       
+   
 
-       $geolocation.get().then(function(position)
-			   {
-				   
-				   console.log(position.coords.latitude);
-				   $scope.map.center.lat=position.coords.latitude;
-				   $scope.map.center.lng=position.coords.longitude;
-				   $scope.lat=position.coords.latitude;
-				   $scope.lng=position.coords.longitude;
-				   coords = {};
-				   coords.lat=position.coords.latitude;
-				   coords.lng=position.coords.longitude;
-				   console.log(position);
-					
-				  
-			   });
+     
 			   
 			   
 				   
 				   
 	  leafletData.getMap().then(function(map) {
 		 
-	  var currentDiameter = L.circle([ $scope.map.center.lat,$scope.map.center.lng], 2000);
-	  map.addLayer(currentDiameter);
+	 
       var drawnItems = new L.featureGroup().addTo(map);
 
 
@@ -99,8 +128,24 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
         edit: {featureGroup: drawnItems }
       }));
       map.on('draw:created', function (event) {
+			  map.removeLayer($scope.layer);
+		  
           var layer = event.layer;
+		  $scope.layer=layer;
+	  
+		  
+	
+		  
+		 
+		 
+		  var layer = event.layer;
+		  $scope.layer=layer;
 		  drawnItems.addLayer(layer);
+		  console.log(layer);
+		    if (layer instanceof L.Circle) {
+			console.log("circle");
+    
+
           console.log(JSON.stringify(layer.toGeoJSON()));
           console.log(JSON.stringify(layer.getRadius()));
           console.log(JSON.stringify(layer.getLatLng().lat));
@@ -112,23 +157,15 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
           msgcoor.rad=JSON.stringify(layer.getRadius());
           msgcoor.lat=JSON.stringify(layer.getLatLng().lat);
           msgcoor.lng=JSON.stringify(layer.getLatLng().lng);
-          send(msgcoor);
           console.log(msgcoor.rad);
+		  }
+		  
       });
       
       
       
       //http post to server
-      function send(coord)
-      {
-		
-		$http.post('/geolog', coord).success(function(data){
-		console.log("good"+data);
-		}).error(function(){
-		console.log("well shit");
-		});  
-		  
-	  }
+      
 
        });
        
@@ -143,49 +180,128 @@ app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
 
 
 
-app.controller('feedCtrl',["$scope",'$geolocation','geoparser','$http',function($scope, $geolocation,geoparser, $http) {
-  // 
+app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams) {
+			 
+			  
+			  
+		$scope.usrcoord={};
+		$scope.usrcoord.lat='';
+		$scope.usrcoord.lng='';
+		ionic.Platform.ready(function() {
+      
+	  var options = {
+      enableHighAccuracy: true,
+      timeout: 100000,
+      maximumAge: 0
+    };
+
+    function success(pos) {
+      var crd = pos.coords;
+
+      console.log('Your current position is:');
+      console.log('Latitude : ' + crd.latitude);
+      console.log('Longitude: ' + crd.longitude);
+      console.log('More or less ' + crd.accuracy + ' meters.');
+    };
+
+    function error(err) {
+      alert('ERROR(' + err.code + '): ' + err.message);
+    };
+
+    navigator.geolocation.getCurrentPosition(success, error, options);
+	  
+    
+	
+	});
+		
 		
 		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
 		$scope.datalist=[];
 		$scope.msg=[];
 		$scope.user=[];
-		var it=this;
-		it.varlist=[];
-		console.log($scope.msg);
 		
-		 
+		console.log("feedctrltest");
 		
-		
-		$geolocation.get().then(function(position)
-			   {
+		   navigator.geolocation.getCurrentPosition(function(position) {
+				 console.log(position.coords.latitude);
+				  
 				   
+        }, function(error) {
+          alert('Unable to get location: ' + error.message);
+        });
+		
+		
+		var posOptions = {timeout: 10000, enableHighAccuracy: false ,  maximumAge: 90000};
+		console.log("feedctrltest1");
+		$cordovaGeolocation.getCurrentPosition(posOptions)
+			.then(function (position) {
+				   console.log("in geolocation");
+				   console.log("pie?");
 				   console.log(position.coords.latitude);
 				   coords = {};
 				   coords.lat=position.coords.latitude;
 				   coords.lng=position.coords.longitude;
-				   console.log(position);
+				   console.log(position+"test");
+				   $scope.usrcoord.lat=position.coords.latitude;;
+				   $scope.usrcoord.lng=position.coords.longitude;
+				   send(coords);
 				   
-				   send(coords);	
 				   
-			   });
+				   
+			   },function(err){
+			   console.log("cant parse");
+			   console.log(err.message);
+			   coords = {};
+			   coords.lat=45.4956033;
+			   coords.lng=-73.57916300000001;
+			   send(coords);
 			   
-		 function send(coord)
+			     
+			   
+			   });
+			   console.log("gap");
+		 function send(coords)
       {
-		
-		$http.post('https://thawing-cliffs-9435.herokuapp.com/feed', coord).success(function(result){
+	  
+	  
+		console.log("insend");
+		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', coords).success(function(result){
 		console.log("good12"+result.data[1]);
-		console.log(result.data[1].msg);
+		
 		console.log(result.data+"dwq");
 		$scope.feedat=result.data;
-		console.log(result.data.length);
+		console.log(result.data.length + "obj2");
 	  
 		}).error(function(){
 		console.log("well shit");
 		
 		});  
 		  
-	  }console.log(it.varlist.length);
+	  }
+	  
+	  $scope.refresh = function () {
+	  	console.log("insend1");
+		console.log($scope.usrcoord);
+		console.log($scope.usrcoord.usrlat);
+		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', $scope.usrcoord).success(function(result){
+		console.log("good12"+result.data[1]);
+		
+		console.log(result.data+"dwq");
+		$scope.feedat=result.data;
+		console.log(result.data.length + "obj2");
+	  
+		}).error(function(){
+		console.log("well shit");
+		
+		})
+		
+		.finally(function() {
+       // Stop the ion-refresher from spinning
+       $scope.$broadcast('scroll.refreshComplete');
+     });
+	  
+	  
+	  };
 	  
 	
 	  
@@ -195,8 +311,40 @@ app.controller('feedCtrl',["$scope",'$geolocation','geoparser','$http',function(
   
 }]);
 
+app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout,$window) {
+	
+	
+  $scope.logout=function ()
+ {
+	console.log('removed');
+    auth.signout();
+    store.remove('token');
+    store.remove('profile');
+    store.remove('refreshToken');
+   
+	window.location.reload();
+  
+  
 
-app.controller('LoginCtrl', function($scope, auth, $state, store) {
+};
+ $state.go('tab.login', {}, {reload: true});
+
+ });
+ 
+ 
+
+
+
+app.controller('LoginCtrl', function($scope, auth, $state, store, $http, $stateParams, $window) {
+
+  $state.transitionTo($state.current, $stateParams, {
+    reload: true,
+    inherit: false,
+    notify: true
+});
+
+$state.forceReload();
+
   function doAuth() {
     auth.signin({
       closable: false,
@@ -209,9 +357,11 @@ app.controller('LoginCtrl', function($scope, auth, $state, store) {
       store.set('profile', profile);
       store.set('token', idToken);
       store.set('refreshToken', refreshToken);
-      $location.path('/tab/about');
+      //$state.go(map);
+	  //$location.path('/map');
     }, function(error) {
       console.log("There was an error logging in", error);
+	  console.log(JSON.stringify(error));
     });
   }
 

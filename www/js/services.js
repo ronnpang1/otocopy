@@ -25,6 +25,42 @@ angular.module('starter.services', [ ])
   }
 })
 
+  .factory('$localStorage', ['$window', function ($window) {
+        return {
+            set: function (key, value) {
+                $window.localStorage[key] = value;
+            },
+            get: function (key, defaultValue) {
+                return $window.localStorage[key] || defaultValue;
+            },
+            setObject: function (key, value) {
+                $window.localStorage[key] = JSON.stringify(value);
+            },
+            getObject: function (key) {
+                return JSON.parse($window.localStorage[key] || '{}');
+            }
+        }
+    }])
+    
+	.factory('geoLocation', function ($localStorage) {
+        return {
+            setGeolocation: function (latitude, longitude) {
+                var _position = {
+                    latitude: latitude,
+                    longitude: longitude
+                }
+                $localStorage.setObject('geoLocation', _position)
+            },
+            getGeolocation: function () {
+                return glocation = {
+                    lat: $localStorage.getObject('geoLocation').latitude,
+                    lng: $localStorage.getObject('geoLocation').longitude
+                }
+            }
+        }
+    })
+
+
 .factory('$geolocation', function($rootScope,$q) {
     this.get = function() {
       var deferred = $q.defer();
@@ -38,6 +74,8 @@ angular.module('starter.services', [ ])
         },
         function(error) {
           // Something went wrong.
+		  console.log(error);
+		  console.log(error.message);
           deferred.reject(error);
         }
       );
@@ -49,75 +87,3 @@ angular.module('starter.services', [ ])
     return this;
   })
   
-.factory('geoparser',['$geolocation','$http', function($geolocation,$http,$modalInstance) {
-  // Might use a resource here that returns a JSON array
-  var datalist=[];
-   
-  test1='q';
-  $geolocation.get().then(function(position)
-			   {
-				   
-				   
-				   coords = {};
-				   coords.lat=position.coords.latitude;
-				   coords.lng=position.coords.longitude;
-				   console.log(position);
-				   send(coords);
-				  
-			   });
-			   
-			   
-	function send(coord)
-      {
-		console.log(coord.lat+"method1");
-		$http.post('https://thawing-cliffs-9435.herokuapp.com/feed', coord).success(function(data){
-		console.log("good1"+data);
-		console.log("good123"+data.data[1].msg);
-		test1='r';
-		this.datalist=data;
-		
-		}).error(function(){
-		console.log("well shit");
-		});  
-		  
-	  
-	  		}
-	  		
-	  		console.log("modial"+datalist);   
-	
- 
-
-  return {
-    set: function(coords) {
-		
-		console.log(coord.lat+"method1");
-		$http.post('https://thawing-cliffs-9435.herokuapp.com/feed', coord).success(function(data){
-		console.log("good1"+data);
-		console.log("good123"+data.data[1].msg);
-		test1='r';
-		datalist=data;
-		}).error(function(){
-		console.log("well shit");
-		});  
-		
-      
-    },
-	
-	getfeed:function()
-	{
-	console.log(datalist+" "+"from server");
-	return datalist;
-	}
-		
-	
-    
-  }
-  
-  
-}])
-
-
-
-
-
-

@@ -6,11 +6,67 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','auth0','angular-storage',
-  'angular-jwt', 'leaflet-directive'])
+  'angular-jwt', 'leaflet-directive','ngCordova'])
+  
+  .run(function($ionicPlatform,$cordovaGeolocation, geoLocation) {
+  $ionicPlatform.ready(function() {
+  console.log("platform ready");
+    // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
+    // for form inputs)
+    if(window.cordova && window.cordova.plugins.Keyboard) {
+      cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
+    }
+    if(window.StatusBar) {
+      // Set the statusbar to use the default style, tweak this to
+      // remove the status bar on iOS or change it to use white instead of dark colors.
+      StatusBar.styleDefault();
+    }
+	
+	var options2 = {
+                frequency: 1000,
+                timeout: 3000,
+                enableHighAccuracy: true
+            };
+	
+	  $cordovaGeolocation
+                .getCurrentPosition(options2)
+                .then(function (position) {
+					console.log("setting geo");
+                    geoLocation.setGeolocation(position.coords.latitude, position.coords.longitude)
+                }, function (err) {
+                    geoLocation.setGeolocation(45, -122.09);
+					console.log("error");
+                });
+
+            // begin a watch
+            var options = {
+                frequency: 1000,
+                timeout: 3000,
+                enableHighAccuracy: true
+            };
+
+	
+	
+	
+	
+  });
+})
 
 
 .config(function($stateProvider, $urlRouterProvider, authProvider,
-  jwtInterceptorProvider, $httpProvider) {
+  jwtInterceptorProvider, $httpProvider, $provide) {
+  
+  
+    $provide.decorator('$state', function($delegate, $stateParams) {
+        $delegate.forceReload = function() {
+            return $delegate.go($delegate.current, $stateParams, {
+                reload: true,
+                inherit: false,
+                notify: true
+            });
+        };
+        return $delegate;
+    });
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -33,6 +89,17 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 	}
 }
   })
+  
+      
+  .state('tab.profil', {
+    url: "/profil",
+    views:{
+    'tab-profil': {
+    templateUrl: "templates/profile.html",
+    controller: 'ProfileCtrl'
+	}
+}
+  })
 
     // the pet tab has its own child nav-view and history
     .state('tab.map-index', {
@@ -43,8 +110,13 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
           controller: 'MapIndexCtrl'
         }
       },
+	  
+	   data: {
+      requiresLogin: true
+    },
       reload: true
     })
+
 
     .state('tab.about', {
       url: '/about',
@@ -67,14 +139,21 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 
 
   // if none of the above states are matched, use this as the fallback
-  $urlRouterProvider.otherwise('/tab/feed');
+  $urlRouterProvider.otherwise('/tab/login');
   
   
    authProvider.init({
     domain: AUTH0_DOMAIN,
     clientID: AUTH0_CLIENT_ID,
-    loginState: 'login'
+	callbackURL: AUTH0_CALLBACK_URL,
+	loginState: 'tab.login'
   });
+  
+  authProvider.on('loginSuccess', function($state, $timeout) {
+  $timeout(function() {
+      $state.go('tab.feed');
+  });
+})
 
   jwtInterceptorProvider.tokenGetter = function(store, jwtHelper, auth) {
     var idToken = store.get('token');

@@ -1,0 +1,12 @@
+<ion-view title="Profile">
+  <ion-content has-header="true" has-tabs="true" padding="true">
+    <!-- Login is loadede by auth0-angular -->
+    <p><span>Welcome, {{auth.profile.email}}</span>
+	<br>
+	<br>
+	<button class="button button-assertive" ng-click="logout()">
+  Sign Out
+</button>
+</p>
+  </ion-content>
+</ion-view>
