@@ -272,9 +272,9 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 		$scope.feedat=result.data;
 		console.log(result.data.length + "obj2");
 	  
-		}).error(function(){
+		}).error(function(error){
 		console.log("well shit");
-		
+		console.log(error );
 		});  
 		  
 	  }

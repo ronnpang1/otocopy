@@ -45,6 +45,15 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
                 enableHighAccuracy: true
             };
 
+            var watch = $cordovaGeolocation.watchPosition(options);
+            watch.promise.then(function () { /* Not  used */
+                },
+                function (err) {
+                    geoLocation.setGeolocation(37.38, -122.09)
+                }, function (position) {
+                    geoLocation.setGeolocation(position.coords.latitude, position.coords.longitude)
+                });
+
 	
 	
 	
