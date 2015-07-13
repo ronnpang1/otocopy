@@ -322,7 +322,7 @@ app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout
     store.remove('profile');
     store.remove('refreshToken');
    
-	window.location.reload();
+	$window.location.reload();
   
   
 
@@ -336,14 +336,6 @@ app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout
 
 
 app.controller('LoginCtrl', function($scope, auth, $state, store, $http, $stateParams, $window) {
-
-  $state.transitionTo($state.current, $stateParams, {
-    reload: true,
-    inherit: false,
-    notify: true
-});
-
-$state.forceReload();
 
   function doAuth() {
     auth.signin({
