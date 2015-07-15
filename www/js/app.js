@@ -63,19 +63,13 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 
 
 .config(function($stateProvider, $urlRouterProvider, authProvider,
-  jwtInterceptorProvider, $httpProvider, $provide) {
+  jwtInterceptorProvider, $httpProvider, $provide, $ionicConfigProvider) {
   
   
-    $provide.decorator('$state', function($delegate, $stateParams) {
-        $delegate.forceReload = function() {
-            return $delegate.go($delegate.current, $stateParams, {
-                reload: true,
-                inherit: false,
-                notify: true
-            });
-        };
-        return $delegate;
-    });
+
+
+    $ionicConfigProvider.tabs.position('bottom');
+	
 
   // Ionic uses AngularUI Router which uses the concept of states
   // Learn more here: https://github.com/angular-ui/ui-router
@@ -100,10 +94,10 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
   })
   
       
-  .state('tab.profil', {
-    url: "/profil",
+  .state('tab.profile', {
+    url: "/profile",
     views:{
-    'tab-profil': {
+    'tab-profile': {
     templateUrl: "templates/profile.html",
     controller: 'ProfileCtrl'
 	}

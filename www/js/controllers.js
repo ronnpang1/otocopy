@@ -2,28 +2,21 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 
 
 // FUCK
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window',
   
   
   
   function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window) 
   {
-  
-	
-		
-			$state.transitionTo($state.current, $stateParams, {
-    reload: true,
-    inherit: false,
-    notify: true
-});
+				
 
 			$scope.layer='';
 			$scope.master = {};
 			$scope.lat= ' ';
 			$scope.lng= ' ';
 			$scope.rad=10;
-			
-		
+			$scope.user = null;
+	
             
 			  $geolocation.get().then(function(position)
 			   {
@@ -37,7 +30,8 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 				   coords.lat=position.coords.latitude;
 				   coords.lng=position.coords.longitude;
 				   console.log(position);
-				   $scope.$apply();
+				   
+
 				  
 			   },function(err){
 			   console.log("cant parse mapdiv");
@@ -45,14 +39,19 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 			   });
 			
 			
+   $scope.refresh= function()
+   {
    
+   $window.location.reload();
+   
+   }
 			
 			
-	  $scope.send= function (user)
+	  $scope.send= function (user,form)
       {
-		$scope.master = angular.copy(user);
+	
 		var msg={};
-		msg.text=$scope.master.msg;
+		msg.text=user.msg;
 		msg.lat=$scope.lat;
 		msg.lng=$scope.lng;
 		msg.rad=$scope.rad;
@@ -60,13 +59,18 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 		console.log(msg.text +msg.lat);
 		 leafletData.getMap().then(function(map) {
 		 map.removeLayer($scope.layer);
+		form.$setPristine();
+		$scope.user = null;
+
+		 console.log(form);
 		 });
 		$http.post('https://thawing-cliffs-9435.herokuapp.com/addmsg', msg).success(function(data){
-		console.log("good"+data
-			);
+		console.log("good"+data);
+		 $window.location.reload();
 		$state.go("tab.feed");
 		}).error(function(){
 		console.log("msg did not go thru");
+		$scope.user = null;
 		});  
 		  
 		  
@@ -187,32 +191,7 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 		$scope.usrcoord={};
 		$scope.usrcoord.lat='';
 		$scope.usrcoord.lng='';
-		ionic.Platform.ready(function() {
-      
-	  var options = {
-      enableHighAccuracy: true,
-      timeout: 100000,
-      maximumAge: 0
-    };
-
-    function success(pos) {
-      var crd = pos.coords;
-
-      console.log('Your current position is:');
-      console.log('Latitude : ' + crd.latitude);
-      console.log('Longitude: ' + crd.longitude);
-      console.log('More or less ' + crd.accuracy + ' meters.');
-    };
-
-    function error(err) {
-      alert('ERROR(' + err.code + '): ' + err.message);
-    };
-
-    navigator.geolocation.getCurrentPosition(success, error, options);
-	  
-    
-	
-	});
+		
 		
 		
 		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
@@ -313,7 +292,7 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 
 app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout,$window) {
 	
-	
+	$scope.auth = auth;
   $scope.logout=function ()
  {
 	console.log('removed');

@@ -70,7 +70,7 @@ angular.module('starter.services', [ ])
         function(result) {
           // Call successful.
           deferred.resolve(result);
-          $rootScope.$apply();
+         
         },
         function(error) {
           // Something went wrong.
