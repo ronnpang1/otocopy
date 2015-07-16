@@ -13,9 +13,17 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
   console.log("platform ready");
     // Hide the accessory bar by default (remove this to show the accessory bar above the keyboard
     // for form inputs)
+	
+	
+	
+	
     if(window.cordova && window.cordova.plugins.Keyboard) {
       cordova.plugins.Keyboard.hideKeyboardAccessoryBar(true);
     }
+	
+
+	
+	
     if(window.StatusBar) {
       // Set the statusbar to use the default style, tweak this to
       // remove the status bar on iOS or change it to use white instead of dark colors.
@@ -144,6 +152,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
   // if none of the above states are matched, use this as the fallback
   $urlRouterProvider.otherwise('/tab/login');
   
+  //auth provider inititalizer
   
    authProvider.init({
     domain: AUTH0_DOMAIN,
@@ -151,6 +160,9 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 	callbackURL: AUTH0_CALLBACK_URL,
 	loginState: 'tab.login'
   });
+  
+  //event listener for login success
+  //will redirect to tab.feed
   
   authProvider.on('loginSuccess', function($state, $timeout) {
   $timeout(function() {

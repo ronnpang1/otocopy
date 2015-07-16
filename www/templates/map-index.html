@@ -5,6 +5,7 @@
 
         <leaflet defaults="map.defaults"  center="map.center" markers="map.markers"  ng-if="map" height="400px"></leaflet>
 		</div>
+		
 <form name="comments"  id="comments" novalidate>
 
   <label class="item item-input">
@@ -12,9 +13,10 @@
   </span>
 
    <label class="item item-input" >
-    <textarea placeholder="Comments" name="textarea" cols="15" rows="3" ng-model="user.msg" > </textarea>
+    <textarea placeholder="Comments" name="textarea" cols="15" rows="1" ng-model="user.msg" > </textarea>
   </label>
-  
+  &nbsp;
+  &nbsp;
       <button class="button button-balanced" ng-click="send(user,comments)"type = "submit">
   send
 </button>

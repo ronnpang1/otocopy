@@ -2,21 +2,30 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 
 
 // FUCK
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window',
+//controllers for states
+//most of the controllers have already been binded dynamically in app.js
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth) 
   {
 				
-
+			$scope.auth=auth;
+			console.log($scope.auth.profile.email);
 			$scope.layer='';
 			$scope.master = {};
 			$scope.lat= ' ';
 			$scope.lng= ' ';
 			$scope.rad=10;
 			$scope.user = null;
-	
+			
+				//get location for map
+				//assign centers to users current location
+				//latitude and longitude are assgined to scope.center.lat and scope.center.lng
+				//important to note that $geolocation is a service
+				//refer to service.js to see this
+				
             
 			  $geolocation.get().then(function(position)
 			   {
@@ -55,6 +64,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 		msg.lat=$scope.lat;
 		msg.lng=$scope.lng;
 		msg.rad=$scope.rad;
+		msg.user=$scope.auth.profile.email;
 		console.log(msg.rad+"RADIUS");
 		console.log(msg.text +msg.lat);
 		 leafletData.getMap().then(function(map) {
@@ -131,9 +141,14 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 		  
         edit: {featureGroup: drawnItems }
       }));
+	  //event layer for when map is drawn
       map.on('draw:created', function (event) {
 			  map.removeLayer($scope.layer);
 		  
+		  
+		  //function called map.on takes argument event
+		  //assign layer to event.layer for easier manipulation
+		  //assign scope variable to it for later removal
           var layer = event.layer;
 		  $scope.layer=layer;
 	  
@@ -146,6 +161,8 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 		  $scope.layer=layer;
 		  drawnItems.addLayer(layer);
 		  console.log(layer);
+		  
+		  // if the circle is the layer, get the radius, center latitiude, center longitude
 		    if (layer instanceof L.Circle) {
 			console.log("circle");
     
@@ -195,7 +212,7 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 		
 		
 		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
-		$scope.datalist=[];
+		
 		$scope.msg=[];
 		$scope.user=[];
 		
@@ -246,9 +263,20 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 		console.log("insend");
 		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', coords).success(function(result){
 		console.log("good12"+result.data[1]);
-		
+				console.log(result);
+
 		console.log(result.data+"dwq");
 		$scope.feedat=result.data;
+		$scope.datalist=[];
+		for(var i=0;i<result.data.length;i++)
+		{
+		
+		$scope.datalist.push(result.data[i]);
+		
+		
+		}
+		
+		console.log($scope.datalist);
 		console.log(result.data.length + "obj2");
 	  
 		}).error(function(error){

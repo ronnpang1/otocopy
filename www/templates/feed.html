@@ -13,7 +13,7 @@
   send
 </button>
 
-<div class="list card" collection-repeat="item in feedat">
+<div class="list card" collection-repeat="item in datalist | orderBy:'-timestamp'">
 
   <div class="item item-avatar">
     <img src="img/ionic.png">
