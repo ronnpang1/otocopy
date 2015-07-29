@@ -6,7 +6,7 @@
 // 'starter.services' is found in services.js
 // 'starter.controllers' is found in controllers.js
 angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','auth0','angular-storage',
-  'angular-jwt', 'leaflet-directive','ngCordova'])
+  'angular-jwt', 'leaflet-directive','ngCordova','cloudinary'])
   
   .run(function($ionicPlatform,$cordovaGeolocation, geoLocation) {
   $ionicPlatform.ready(function() {
@@ -71,9 +71,10 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 
 
 .config(function($stateProvider, $urlRouterProvider, authProvider,
-  jwtInterceptorProvider, $httpProvider, $provide, $ionicConfigProvider) {
+  jwtInterceptorProvider, $httpProvider, $provide, $ionicConfigProvider, $compileProvider) {
   
-  
+    $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
+
 
 
     $ionicConfigProvider.tabs.position('bottom');

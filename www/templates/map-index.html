@@ -5,6 +5,7 @@
 
         <leaflet defaults="map.defaults"  center="map.center" markers="map.markers"  ng-if="map" height="400px"></leaflet>
 		</div>
+	
 		
 <form name="comments"  id="comments" novalidate>
 
@@ -23,15 +24,34 @@
 &nbsp;
 &nbsp;
 &nbsp;
+
   <button class="button button-balanced" ng-click="refresh()"type = "button">
   refresh
 </button>
- 
- 
-<br>
+&nbsp;
+&nbsp;
+&nbsp;
+
+  
 
 </label>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+ <button ng-click="getPhoto()" class="button button-balanced">Photo</button>
+ 
+ <button ng-click="upload()" class="button button-balanced">upload</button>
    </form>
+   
+   
+    
+   
 	   
 	 
 

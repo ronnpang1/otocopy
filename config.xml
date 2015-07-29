@@ -1291,6 +1291,12 @@
   <feature name="StatusBar">
     <param name="ios-package" value="CDVStatusBar" onload="true"/>
   </feature>
+   <feature name="File">
+      <param name="android-package" value="org.apache.cordova.FileUtils" />
+  </feature>
+  <feature name="FileTransfer">
+      <param name="android-package" value="org.apache.cordova.FileTransfer" />
+  </feature>
   <gap:config-file platform="android" parent="/manifest">
     <application android:debuggable="true"/>
   </gap:config-file>

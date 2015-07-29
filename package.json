@@ -14,8 +14,11 @@
     "gulp-util": "^2.2.14",
     "shelljs": "^0.3.0"
   },
-  "cordovaPlugins": [],
-  "cordovaPlatforms": [
-    "android"
-  ]
+  "cordovaPlugins": [
+    {
+      "locator": "https://git-wip-us.apache.org/repos/asf/cordova-plugin-file-transfer.git",
+      "id": "cordova-plugin-file-transfer"
+    }
+  ],
+  "cordovaPlatforms": []
 }

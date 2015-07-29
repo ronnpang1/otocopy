@@ -1,14 +1,14 @@
-var app = angular.module('starter.controllers', ["leaflet-directive"]);
+var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUpload"]);
 
 
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload, $cordovaFileTransfer) 
   {
 				
 			$scope.auth=auth;
@@ -55,6 +55,70 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
    
    }
 			
+			
+	 $scope.getPhoto = function() {
+    Camera.getPicture().then(function(imageURI) {
+      console.log("photo"+imageURI);
+	    $scope.picData = imageURI;
+		
+    }, function(err) {
+      console.err(err);
+    });
+  };
+   $scope.upload = function() {
+   var myImg = $scope.picData;
+    
+	   var options = new FileUploadOptions();
+    options.fileKey="file";
+    options.fileName=myImg.substr(myImg.lastIndexOf('/')+1);
+    options.mimeType="image/jpeg";
+
+    // these are the upload parameters - note that these are actually almost empty since we're not supplying any special upload
+    // upload parameters. So the signature is really the result of signing your api_secret
+    var params = {upload_preset: "lfwyku4h"};
+
+    options.params = params;
+
+    var ft = new FileTransfer();
+	
+	ft.upload(myImg, encodeURI("https://api.cloudinary.com/v1_1/oto/upload"), win, fail, options);
+
+	
+	
+
+console.log(myImg);
+	 
+		/*
+        Upload.upload({
+          url: "https://api.cloudinary.com/v1_1/" + 'oto' + "/upload",
+		   data: {upload_preset: 'lfwyku4h', tags: 'myphotoalbum', context:'photo=' + "test"},
+		   skipAuthorization: true,
+          file: myImg,
+		  fields: {
+		  upload_preset: 'lfwyku4h'
+          }
+        })
+			*/
+		console.log("uploading");
+   
+   var win = function (r) {
+    console.log("Code = " + r.responseCode);
+    console.log("Response = " + r.response);
+    console.log("Sent = " + r.bytesSent);
+}
+
+var fail = function (error) {
+    alert("An error has occurred: Code = " + error.code);
+    console.log("upload error source " + error.source);
+    console.log("upload error target " + error.target);
+}
+   
+   
+   };
+   
+
+  
+  
 			
 	  $scope.send= function (user,form)
       {
@@ -190,6 +254,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive"]);
 
        });
        
+	   
        }]);
 
 // A simple controller that shows a tapped item's data
@@ -198,6 +263,8 @@ app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
   $scope.pet = PetService.get($stateParams.petId);
   
 });
+
+
 
 
 
