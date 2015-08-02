@@ -1294,6 +1294,10 @@
    <feature name="File">
       <param name="android-package" value="org.apache.cordova.FileUtils" />
   </feature>
+  
+  <feature name="Capture">
+      <param name="android-package" value="org.apache.cordova.Capture" />
+  </feature>
   <feature name="FileTransfer">
       <param name="android-package" value="org.apache.cordova.FileTransfer" />
   </feature>

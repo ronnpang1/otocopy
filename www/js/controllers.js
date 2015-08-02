@@ -4,11 +4,11 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload, $cordovaFileTransfer) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video, $cordovaFileTransfer,$cordovaCapture,VideoService) 
   {
 				
 			$scope.auth=auth;
@@ -54,21 +54,43 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
    $window.location.reload();
    
    }
-			
-			
-	 $scope.getPhoto = function() {
+
+
+	 
+    // Called if something bad happens.
+    //
+    $scope.clip = '';
+ 
+$scope.captureVideo = function() {
+ video.captureVideo().then(function(videoData) {
+$scope.clip = videoData;
+$scope.datatype="video";
+
+ var path=window.resolveLocalFileSystemURL(videoData[0].localURL);
+console.log(videoData);
+console.log(videoData[0].fullPath);
+console.log(path);
+
+
+ }, function(err) {
+      console.err(err);
+    });
+};
+	
+	
+	$scope.getPhoto = function() {
     Camera.getPicture().then(function(imageURI) {
       console.log("photo"+imageURI);
 	    $scope.picData = imageURI;
-		
+		$scope.datatype="pic";
     }, function(err) {
       console.err(err);
     });
   };
    $scope.upload = function() {
+  
    var myImg = $scope.picData;
-    
-	   var options = new FileUploadOptions();
+   var options = new FileUploadOptions();
     options.fileKey="file";
     options.fileName=myImg.substr(myImg.lastIndexOf('/')+1);
     options.mimeType="image/jpeg";
@@ -101,23 +123,55 @@ console.log(myImg);
 			*/
 		console.log("uploading");
    
-   var win = function (r) {
-    console.log("Code = " + r.responseCode);
-    console.log("Response = " + r.response);
-    console.log("Sent = " + r.bytesSent);
-}
+      function win(r) {
+          console.log("Code = " + r.responseCode.toString()+"\n");
+          console.log("Response = " + r.response.toString()+"\n");
+          console.log("Sent = " + r.bytesSent.toString()+"\n");
+          alert("PHOTO UPLOADED!!");
+      }
 
-var fail = function (error) {
-    alert("An error has occurred: Code = " + error.code);
-    console.log("upload error source " + error.source);
-    console.log("upload error target " + error.target);
-}
-   
+      function fail(error) {
+          alert("An error has occurred: Code = " + error.code);
+      }
    
    };
    
 
+  $scope.uploadvideo=function()
+  {
+	  
+	 
   
+   var video = $scope.clip[0].fullPath;
+   var options = new FileUploadOptions();
+    options.fileKey="file";
+    options.fileName=video.substr(video.lastIndexOf('/')+1);
+    options.mimeType="video/mp4";
+
+    // these are the upload parameters - note that these are actually almost empty since we're not supplying any special upload
+    // upload parameters. So the signature is really the result of signing your api_secret
+    var params = {upload_preset: "lfwyku4h"};
+
+    options.params = params;
+
+    var ft = new FileTransfer();
+	
+	ft.upload(video, encodeURI("https://api.cloudinary.com/v1_1/oto/upload"), win, fail, options);
+	
+	function win(r) {
+          console.log("Code = " + r.responseCode.toString()+"\n");
+          console.log("Response = " + r.response.toString()+"\n");
+          console.log("Sent = " + r.bytesSent.toString()+"\n");
+          alert("PHOTO UPLOADED!!");
+      }
+
+      function fail(error) {
+          alert("An error has occurred: Code = " + error.code);
+      }
+   
+	  
+	  
+  }
   
 			
 	  $scope.send= function (user,form)
