@@ -19,7 +19,10 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			$scope.lng= ' ';
 			$scope.rad=10;
 			$scope.user = null;
-			
+			$scope.clip='';
+			$scope.picData='';
+			$scope.videourl='';
+			$scope.imgurl='';
 				//get location for map
 				//assign centers to users current location
 				//latitude and longitude are assgined to scope.center.lat and scope.center.lng
@@ -59,8 +62,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 	 
     // Called if something bad happens.
     //
-    $scope.clip = '';
- 
+    
 $scope.captureVideo = function() {
  video.captureVideo().then(function(videoData) {
 $scope.clip = videoData;
@@ -128,6 +130,15 @@ console.log(myImg);
           console.log("Response = " + r.response.toString()+"\n");
           console.log("Sent = " + r.bytesSent.toString()+"\n");
           alert("PHOTO UPLOADED!!");
+		  
+		 
+		  var responses=JSON.parse(r.response);
+		  console.log("responses"+responses.url);
+		  $scope.imgurl=responses.url;
+		  
+		  
+		 
+		  console.log("imgurl"+$scope.imgurl);
       }
 
       function fail(error) {
@@ -162,7 +173,10 @@ console.log(myImg);
           console.log("Code = " + r.responseCode.toString()+"\n");
           console.log("Response = " + r.response.toString()+"\n");
           console.log("Sent = " + r.bytesSent.toString()+"\n");
-          alert("PHOTO UPLOADED!!");
+          alert("VIDEO UPLOADED!!");
+		  var responses=JSON.parse(r.response);
+		  $scope.videourl=responses.url;
+		  
       }
 
       function fail(error) {
@@ -176,24 +190,40 @@ console.log(myImg);
 			
 	  $scope.send= function (user,form)
       {
-	
+		
 		var msg={};
 		msg.text=user.msg;
 		msg.lat=$scope.lat;
 		msg.lng=$scope.lng;
 		msg.rad=$scope.rad;
 		msg.user=$scope.auth.profile.email;
+		msg.media='text';
+		if(!($scope.picData=''))
+		{
+			
+		msg.img=$scope.imgurl;
+		msg.media='picture';
+			
+		}
+		if(!($scope.clip=''))
+		{
+			
+		msg.vid=$scope.videourl;
+		msg.media='video';	
+		}
+		
 		console.log(msg.rad+"RADIUS");
 		console.log(msg.text +msg.lat);
 		 leafletData.getMap().then(function(map) {
 		 map.removeLayer($scope.layer);
 		form.$setPristine();
 		$scope.user = null;
-
+		console.log(msg.media);
 		 console.log(form);
 		 });
 		$http.post('https://thawing-cliffs-9435.herokuapp.com/addmsg', msg).success(function(data){
 		console.log("good"+data);
+		msg.media="";
 		 $window.location.reload();
 		$state.go("tab.feed");
 		}).error(function(){
