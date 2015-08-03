@@ -20,8 +20,26 @@
   </div>
 
   <div class="item item-body">
+  {{item.msg}}
+  <div ng-if="item.media=='picture'">
+      <img class="full-image" src="{{item.media_url}}">
 
-	{{item.msg}}
+  </div>
+  
+  <div ng-if="item.media=='video'">
+
+  
+  <video id="video1" width="480" preload="metadata" controls webkit-playsinline>
+    <source type="video/mp4" src="{{item.media_url}}"></source>
+    
+   
+</video>
+                   
+				  
+  </div>
+  
+  
+	
     <p>
       <a href="#" class="subdued">{{item.upvote}} Like</a>
       <a href="#" class="subdued">{{item.downvote}} Disike</a>

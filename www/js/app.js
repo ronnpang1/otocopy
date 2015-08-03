@@ -71,10 +71,10 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
 
 
 .config(function($stateProvider, $urlRouterProvider, authProvider,
-  jwtInterceptorProvider, $httpProvider, $provide, $ionicConfigProvider, $compileProvider) {
+  jwtInterceptorProvider, $httpProvider, $provide, $ionicConfigProvider, $compileProvider,$sceDelegateProvider) {
   
     $compileProvider.imgSrcSanitizationWhitelist(/^\s*(https?|ftp|mailto|file|tel):/);
-
+	$sceDelegateProvider.resourceUrlWhitelist(['^(?:http(?:s)?:\/\/)?(?:[^\.]+\.)?\(vimeo|youtube|cloudinary|res.cloudinary)\.com(/.*)?$', 'http://res.cloudinary.com/**', 'self']);
 
 
     $ionicConfigProvider.tabs.position('bottom');

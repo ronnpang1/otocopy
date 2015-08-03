@@ -19,8 +19,8 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			$scope.lng= ' ';
 			$scope.rad=10;
 			$scope.user = null;
-			$scope.clip='';
-			$scope.picData='';
+			$scope.video=false;
+			$scope.img=false;
 			$scope.videourl='';
 			$scope.imgurl='';
 				//get location for map
@@ -72,7 +72,6 @@ $scope.datatype="video";
 console.log(videoData);
 console.log(videoData[0].fullPath);
 console.log(path);
-
 
  }, function(err) {
       console.err(err);
@@ -129,6 +128,8 @@ console.log(myImg);
           console.log("Code = " + r.responseCode.toString()+"\n");
           console.log("Response = " + r.response.toString()+"\n");
           console.log("Sent = " + r.bytesSent.toString()+"\n");
+		  console.log($scope.picData);
+		  $scope.img=true;
           alert("PHOTO UPLOADED!!");
 		  
 		 
@@ -173,9 +174,11 @@ console.log(myImg);
           console.log("Code = " + r.responseCode.toString()+"\n");
           console.log("Response = " + r.response.toString()+"\n");
           console.log("Sent = " + r.bytesSent.toString()+"\n");
+		  $scope.video=true;
           alert("VIDEO UPLOADED!!");
 		  var responses=JSON.parse(r.response);
 		  $scope.videourl=responses.url;
+		  
 		  
       }
 
@@ -198,19 +201,23 @@ console.log(myImg);
 		msg.rad=$scope.rad;
 		msg.user=$scope.auth.profile.email;
 		msg.media='text';
-		if(!($scope.picData=''))
+		msg.link='blank';
+			if($scope.video)
+
 		{
 			
-		msg.img=$scope.imgurl;
+		msg.link=$scope.videourl;
+		msg.media='video';	
+		}
+		if($scope.img)
+		{
+			
+		msg.link=$scope.imgurl;
 		msg.media='picture';
 			
 		}
-		if(!($scope.clip=''))
-		{
-			
-		msg.vid=$scope.videourl;
-		msg.media='video';	
-		}
+	
+		
 		
 		console.log(msg.rad+"RADIUS");
 		console.log(msg.text +msg.lat);
@@ -413,8 +420,8 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 	  
 		console.log("insend");
 		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', coords).success(function(result){
-		console.log("good12"+result.data[1]);
-				console.log(result);
+		
+				console.log("results:"+result);
 
 		console.log(result.data+"dwq");
 		$scope.feedat=result.data;
