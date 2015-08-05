@@ -4,11 +4,11 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video, $cordovaFileTransfer,$cordovaCapture,VideoService) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video,$compile,$cordovaFileTransfer,$cordovaCapture,VideoService) 
   {
 				
 			$scope.auth=auth;
@@ -23,6 +23,8 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			$scope.img=false;
 			$scope.videourl='';
 			$scope.imgurl='';
+			
+			
 				//get location for map
 				//assign centers to users current location
 				//latitude and longitude are assgined to scope.center.lat and scope.center.lng
@@ -49,6 +51,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			   console.log("cant parse mapdiv");
 			   console.log(err.message);
 			   });
+			
 			
 			
    $scope.refresh= function()
@@ -189,6 +192,19 @@ console.log(myImg);
 	  
 	  
   }
+	function mapmarker(lat,lng,$compile)
+	{
+		
+		 var html='<button class= button" ng-click="refresh()" type = "button">  refresh </button>'
+		 linkFunction = $compile(angular.element(html)),
+    newScope = $scope.$new();
+	
+		
+
+var marker = L.marker([lat, lng]).bindPopup(linkFunction(newScope)[0]);
+		
+		
+	}
   
 			
 	  $scope.send= function (user,form)
@@ -268,7 +284,10 @@ console.log(myImg);
         };
 		
 		
-				
+				$scope.$on('leafletDirectiveMarker.popupopen', function (event, leafletEvent) {
+
+console.log("event"+event);
+            });
        
    
 
@@ -279,7 +298,7 @@ console.log(myImg);
 				   
 	  leafletData.getMap().then(function(map) {
 		 
-	 
+	
       var drawnItems = new L.featureGroup().addTo(map);
 
 
@@ -306,9 +325,7 @@ console.log(myImg);
 		  //assign scope variable to it for later removal
           var layer = event.layer;
 		  $scope.layer=layer;
-	  
-		  
-	
+			
 		  
 		 
 		 
@@ -321,18 +338,34 @@ console.log(myImg);
 		    if (layer instanceof L.Circle) {
 			console.log("circle");
     
+		  var myIcon = L.divIcon({className: 'my-div-icon'});
 
           console.log(JSON.stringify(layer.toGeoJSON()));
           console.log(JSON.stringify(layer.getRadius()));
           console.log(JSON.stringify(layer.getLatLng().lat));
           var msgcoor= {};
+		 var html='<button class= button" ng-click="refresh()" type = "button">  refresh </button>'+'<br>' + '<button class= button" ng-click="refresh()" type = "button">  send </button>'
+
           $scope.lat=layer.getLatLng().lat;
           $scope.lng=layer.getLatLng().lng;
           $scope.rad=layer.getRadius();
+		   $scope.map.markers.now = {
+              lat:$scope.lat,
+              lng:$scope.lng,
+              message: html,
+			  getMessageScope: function() { return $scope; },         
+              focus: true,  
+              draggable: false
+            };
+		 
+		
           console.log("msgcoord"+ layer.getLatLng().lng);
           msgcoor.rad=JSON.stringify(layer.getRadius());
           msgcoor.lat=JSON.stringify(layer.getLatLng().lat);
           msgcoor.lng=JSON.stringify(layer.getLatLng().lng);
+		  
+		    
+		  
           console.log(msgcoor.rad);
 		  }
 		  
