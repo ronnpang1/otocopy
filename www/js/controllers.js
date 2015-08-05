@@ -1,15 +1,25 @@
-var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUpload"]);
+var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUpload","ionic"]);
 
 
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile','$ionicModal',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video,$compile,$cordovaFileTransfer,$cordovaCapture,VideoService) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video,$compile,$ionicModal,$cordovaFileTransfer,$cordovaCapture,VideoService) 
   {
+	
+	   $ionicModal.fromTemplateUrl('modal.html', function($ionicModal) {
+        $scope.modal = $ionicModal;
+    }, {
+        // Use our scope for the scope of the modal to keep it simple
+        scope: $scope,
+        // The animation we want to use for the modal entrance
+        animation: 'slide-in-up'
+    });  
+
 				
 			$scope.auth=auth;
 			console.log($scope.auth.profile.email);
@@ -134,8 +144,6 @@ console.log(myImg);
 		  console.log($scope.picData);
 		  $scope.img=true;
           alert("PHOTO UPLOADED!!");
-		  
-		 
 		  var responses=JSON.parse(r.response);
 		  console.log("responses"+responses.url);
 		  $scope.imgurl=responses.url;
@@ -344,7 +352,13 @@ console.log("event"+event);
           console.log(JSON.stringify(layer.getRadius()));
           console.log(JSON.stringify(layer.getLatLng().lat));
           var msgcoor= {};
-		 var html='<button class= button" ng-click="refresh()" type = "button">  refresh </button>'+'<br>' + '<button class= button" ng-click="refresh()" type = "button">  send </button>'
+		 var html='<button  ng-click="refresh()" class="button button-balanced">  refresh </button>'+
+			'&nbsp'+'&nbsp'+
+		 '<button  ng-click="getPhoto()" class="button button-balanced">  photo </button>'+ 
+		   '&nbsp'+'&nbsp'+
+		  '<button ng-click="captureVideo()" class="button button-balanced">video</button>'
+			+ '&nbsp'+'&nbsp'+
+			'<button ng-click="modal.show()" class="button button-balanced">text</button>'
 
           $scope.lat=layer.getLatLng().lat;
           $scope.lng=layer.getLatLng().lng;
