@@ -5,12 +5,13 @@
 
         <leaflet defaults="map.defaults"  center="map.center" markers="map.markers"  ng-if="map" height="400px"></leaflet>
 		</div>
+	
 	<script id="modal.html" type="text/ng-template">
 	 <body ng-controller="MapIndexCtrl">
       <div class="modal">
         <header class="bar bar-header bar-positive">
           <h1 class="title">text</h1>
-          <div class="button button-clear" ng-click="modal.hide()"><span class="icon ion-close"></span></div>
+          <div class="button button-clear" ng-click="closeModal(1)"><span class="icon ion-close"></span></div>
         </header>
         <content has-header="true" padding="true">
           
@@ -26,7 +27,7 @@
   </div>
   &nbsp;
   &nbsp;
-      <button class="button button-balanced" ng-click="send(user,comments)"type = "submit">
+      <button class="button button-balanced" ng-click="send(user,comments,1)"type = "submit">
   send
 </button>
 &nbsp;
@@ -66,19 +67,29 @@
       </div>
 	  </body>
     </script>
-		
-<form name="comments"  id="comments" novalidate>
-
-  <label class="item item-input">
-  <span class="input-label">input  
+	
+	<script id="modalimg.html" type="text/ng-template">
+	 <body ng-controller="MapIndexCtrl">
+      <div class="modal">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">Image</h1>
+          <div class="button button-clear" ng-click="closeModal(2)"><span class="icon ion-close"></span></div>
+        </header>
+        <content has-header="true" padding="true">
+        
+		     <form name="comments"  id="comments" novalidate>
+< 
+  <div class="item item-input">
+  <span class="input-label">input1</h1>
+		  <p>dwqdq+{{$scope.loading }}</p>  
   </span>
 
-   <label class="item item-input" >
+   <div class="item item-input" >
     <textarea placeholder="Comments" name="textarea" cols="15" rows="1" ng-model="user.msg" > </textarea>
-  </label>
+  </div>
   &nbsp;
   &nbsp;
-      <button class="button button-balanced" ng-click="send(user,comments)"type = "submit">
+      <button class="button button-balanced" ng-click="send(user,comments,2)"type = "submit">
   send
 </button>
 &nbsp;
@@ -94,7 +105,69 @@
 
   
 
-</label>
+</div>
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+&nbsp;
+ <button ng-click="getPhoto()" class="button button-balanced">Photo</button>
+ <button ng-click="captureVideo()" class="button button-balanced">video</button>
+ 
+ 
+ <button ng-click="upload()" class="button button-balanced">Image upload</button>
+ <button ng-click="uploadvideo()" class="button button-balanced">Video upload</button>
+  
+ 
+   </form>
+
+        </content>
+      </div>
+	  </body>
+    </script>
+	
+	<script id="modalvid.html" type="text/ng-template">
+	 <body ng-controller="MapIndexCtrl">
+      <div class="modal">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">Video</h1>
+          <div class="button button-clear" ng-click="closeModal(3)"><span class="icon ion-close"></span></div>
+        </header>
+        <content has-header="true" padding="true">
+          
+		  <h1>dwqdq</h1>
+		     <form name="comments"  id="comments" novalidate>
+
+  <div class="item item-input">
+  <span class="input-label">input  
+  </span>
+
+   <div class="item item-input" >
+    <textarea placeholder="Comments" name="textarea" cols="15" rows="1" ng-model="user.msg" > </textarea>
+  </div>
+  &nbsp;
+  &nbsp;
+      <button class="button button-balanced" ng-click="send(user,comments,3)"type = "submit">
+  send
+</button>
+&nbsp;
+&nbsp;
+&nbsp;
+
+  <button class="button button-balanced" ng-click="refresh()"type = "button">
+  refresh
+</button>
+&nbsp;
+&nbsp;
+&nbsp;
+
+  
+
+</div>
 &nbsp;
 &nbsp;
 &nbsp;
@@ -113,8 +186,12 @@
  
  
    </form>
-   
-   
+
+        </content>
+      </div>
+	  </body>
+    </script>
+
     
    
 	   

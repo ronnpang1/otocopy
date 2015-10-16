@@ -35,8 +35,8 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
                 timeout: 3000,
                 enableHighAccuracy: true
             };
-	
-	  /*$cordovaGeolocation
+	/*
+	  $cordovaGeolocation
                 .getCurrentPosition(options2)
                 .then(function (position) {
 					console.log("setting geo");
@@ -44,7 +44,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
                 }, function (err) {
                     geoLocation.setGeolocation(45, -122.09);
 					console.log("error");
-                });
+                });*/
 
             // begin a watch
             var options = {
@@ -54,13 +54,13 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
             };
 
             var watch = $cordovaGeolocation.watchPosition(options);
-            watch.promise.then(function () { /* Not  used 
+            watch.promise.then(function () { 
                 },
                 function (err) {
                     geoLocation.setGeolocation(37.38, -122.09)
                 }, function (position) {
                     geoLocation.setGeolocation(position.coords.latitude, position.coords.longitude)
-                });*/
+                });
 
 	
 	

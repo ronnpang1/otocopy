@@ -4,22 +4,72 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile','$ionicModal',
+  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile','$ionicModal','geoLocation',
   
   
   
-  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video,$compile,$ionicModal,$cordovaFileTransfer,$cordovaCapture,VideoService) 
+  function($scope, leafletData, $geolocation, $http,$state, $stateParams, $window, auth,Camera, Upload,video,$compile,$ionicModal, geoLocation,$cordovaFileTransfer,$cordovaCapture,VideoService) 
   {
 	
+		
+		
+		 ionic.Platform.ready(function() {
+			$scope.testlat=geoLocation.getGeolocation().lat;
+			$scope.testlng=geoLocation.getGeolocation().lng;
+			
+			 
+				  
+			
+
+			
+			
+			
+			console.log($scope.testlat+"testlat");
+			
+		
+		
+	
 	   $ionicModal.fromTemplateUrl('modal.html', function($ionicModal) {
-        $scope.modal = $ionicModal;
+		   id:1;
+        $scope.modaltext = $ionicModal;
     }, {
         // Use our scope for the scope of the modal to keep it simple
         scope: $scope,
         // The animation we want to use for the modal entrance
         animation: 'slide-in-up'
     });  
+	
+	 $ionicModal.fromTemplateUrl('modalimg.html', function($ionicModal) {
+		  id:2;
+        $scope.modalimg = $ionicModal;
+    }, {
+        // Use our scope for the scope of the modal to keep it simple
+        scope: $scope,
+        // The animation we want to use for the modal entrance
+        animation: 'slide-in-up'
+    });  
+	
+	 $ionicModal.fromTemplateUrl('modalvid.html', function($ionicModal) {
+		  id:3;
+        $scope.modalvid = $ionicModal;
+    }, {
+        // Use our scope for the scope of the modal to keep it simple
+        scope: $scope,
+        // The animation we want to use for the modal entrance
+        animation: 'slide-in-up'
+    });  
+	
+	$scope.openModal = function(index) {
+      if (index == 1) $scope.modaltext.show();
+      if (index == 2) $scope.modalimg.show();
+	  if (index == 3) $scope.modalvid.show();
+	};
 
+	$scope.closeModal=function(index) {
+      if (index == 1) $scope.modaltext.hide();
+      if (index == 2) $scope.modalimg.hide();
+	  if (index == 3) $scope.modalvid.hide();
+	};
 				
 			$scope.auth=auth;
 			console.log($scope.auth.profile.email);
@@ -33,7 +83,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			$scope.img=false;
 			$scope.videourl='';
 			$scope.imgurl='';
-			
+			$scope.loading='';
 			
 				//get location for map
 				//assign centers to users current location
@@ -41,7 +91,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 				//important to note that $geolocation is a service
 				//refer to service.js to see this
 				
-            
+            /*
 			  $geolocation.get().then(function(position)
 			   {
 				   
@@ -60,7 +110,7 @@ var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUplo
 			   },function(err){
 			   console.log("cant parse mapdiv");
 			   console.log(err.message);
-			   });
+			   });*/
 			
 			
 			
@@ -87,7 +137,7 @@ console.log(videoData[0].fullPath);
 console.log(path);
 
  }, function(err) {
-      console.err(err);
+      console.err(err);                         
     });
 };
 	
@@ -107,6 +157,7 @@ console.log(path);
    var options = new FileUploadOptions();
     options.fileKey="file";
     options.fileName=myImg.substr(myImg.lastIndexOf('/')+1);
+	var filename=myImg.substr(myImg.lastIndexOf('/')+1);
     options.mimeType="image/jpeg";
 
     // these are the upload parameters - note that these are actually almost empty since we're not supplying any special upload
@@ -117,9 +168,22 @@ console.log(path);
 
     var ft = new FileTransfer();
 	
-	ft.upload(myImg, encodeURI("https://api.cloudinary.com/v1_1/oto/upload"), win, fail, options);
-
+		ft.onprogress = function(progressEvent) {
+		if (progressEvent.lengthComputable) {
+			var perc = Math.floor(progressEvent.loaded / progressEvent.total * 100);
+			$scope.loading  = perc + "% loaded...";
+		} else {
+			if($scope.loading == "") {
+				$scope.loading  = "Loading";
+			} else {
+				$scope.loading  += ".";
+			}
+		}
+	};
 	
+	ft.upload(myImg, encodeURI("https://api.cloudinary.com/v1_1/oto/upload"), win, fail, options);
+	
+
 	
 
 console.log(myImg);
@@ -129,7 +193,7 @@ console.log(myImg);
           url: "https://api.cloudinary.com/v1_1/" + 'oto' + "/upload",
 		   data: {upload_preset: 'lfwyku4h', tags: 'myphotoalbum', context:'photo=' + "test"},
 		   skipAuthorization: true,
-          file: myImg,
+          file: filename,
 		  fields: {
 		  upload_preset: 'lfwyku4h'
           }
@@ -215,7 +279,7 @@ var marker = L.marker([lat, lng]).bindPopup(linkFunction(newScope)[0]);
 	}
   
 			
-	  $scope.send= function (user,form)
+	  $scope.send= function (user,form,index)
       {
 		
 		var msg={};
@@ -247,15 +311,17 @@ var marker = L.marker([lat, lng]).bindPopup(linkFunction(newScope)[0]);
 		console.log(msg.text +msg.lat);
 		 leafletData.getMap().then(function(map) {
 		 map.removeLayer($scope.layer);
+		 user.msg='';
 		form.$setPristine();
 		$scope.user = null;
+		$scope.closeModal(index);
 		console.log(msg.media);
 		 console.log(form);
 		 });
 		$http.post('https://thawing-cliffs-9435.herokuapp.com/addmsg', msg).success(function(data){
 		console.log("good"+data);
 		msg.media="";
-		 $window.location.reload();
+		 //$window.location.reload();
 		$state.go("tab.feed");
 		}).error(function(){
 		console.log("msg did not go thru");
@@ -308,7 +374,9 @@ console.log("event"+event);
 		 
 	
       var drawnItems = new L.featureGroup().addTo(map);
-
+$scope.map.center.lat=geoLocation.getGeolocation().lat;
+			$scope.map.center.lng=geoLocation.getGeolocation().lng;
+    
 
 		
       map.addControl(new L.Control.Draw({
@@ -354,11 +422,11 @@ console.log("event"+event);
           var msgcoor= {};
 		 var html='<button  ng-click="refresh()" class="button button-balanced">  refresh </button>'+
 			'&nbsp'+'&nbsp'+
-		 '<button  ng-click="getPhoto()" class="button button-balanced">  photo </button>'+ 
+		 '<button  ng-click="openModal(2)" class="button button-balanced">  photo </button>'+ 
 		   '&nbsp'+'&nbsp'+
-		  '<button ng-click="captureVideo()" class="button button-balanced">video</button>'
+		  '<button ng-click="openModal(3)" class="button button-balanced">video</button>'
 			+ '&nbsp'+'&nbsp'+
-			'<button ng-click="modal.show()" class="button button-balanced">text</button>'
+			'<button ng-click="openModal(1)" class="button button-balanced">text</button>'
 
           $scope.lat=layer.getLatLng().lat;
           $scope.lng=layer.getLatLng().lng;
@@ -391,9 +459,11 @@ console.log("event"+event);
       
 
        });
-       
+         });
 	   
-       }]);
+       }
+	   
+	   ]);
 
 // A simple controller that shows a tapped item's data
 app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
@@ -406,14 +476,67 @@ app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
 
 
 
-app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams) {
+app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams','auth','$ionicModal','geoLocation',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams,auth,$ionicModal,geoLocation) {
 			 
-			  
-			  
-		$scope.usrcoord={};
+			 ionic.Platform.ready(function() {
+			$scope.usrcoord={};
 		$scope.usrcoord.lat='';
 		$scope.usrcoord.lng='';
+			$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
+			$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
 		
+			  
+		$scope.auth=auth;
+		$scope.usrcoord={};
+		
+		$scope.inboxlist=[];
+	 $ionicModal.fromTemplateUrl('modalinbox.html', function($ionicModal) {
+		  id:2;
+        $scope.modalinbox = $ionicModal;
+    }, {
+        // Use our scope for the scope of the modal to keep it simple
+        scope: $scope,
+        // The animation we want to use for the modal entrance
+        animation: 'slide-in-up'
+    });  
+	
+	
+	 
+			 $scope.openModal = function(user)
+			 {
+				  $scope.inbox=user;
+				  $scope.modalinbox.show();
+				 
+			 }
+			 
+			 $scope.sendinboxmsg= function(user,form)
+			 {
+				 
+				 var inbxmsg={};
+				 inbxmsg.sender=$scope.auth.profile.email;
+				 inbxmsg.receiver=$scope.inbox;
+				 inbxmsg.msg=user.msg;
+				 
+				 console.log(inbxmsg.sender);
+				 console.log(inbxmsg.receiver);
+				 console.log(inbxmsg.msg);
+
+				 //inbxmsg.msg=msg;
+				 
+				 $http.post('https://thawing-cliffs-9435.herokuapp.com/inbox', inbxmsg).success(function(data){
+		console.log("good"+data);
+		
+		 //$window.location.reload();
+		$state.go("tab.feed");
+		}).error(function(){
+		console.log("msg did not go thru");
+		$scope.user = null;
+		});  
+		
+		
+				 
+				 
+			 }
 		
 		
 		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
@@ -461,6 +584,37 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 			   
 			   });
 			   console.log("gap");
+			   
+
+			   
+$scope.reply =function (user,id,form)
+      {
+		
+		var msg={};
+		msg.text=user.reply;
+		msg.poster=$scope.auth.profile.email;
+		msg.id=id;
+		console.log(msg.text);
+		console.log(msg.poster);
+		console.log(msg.id);
+		
+		
+	  
+	  $http.post('https://thawing-cliffs-9435.herokuapp.com/reply', msg).success(function(data){
+		console.log("good"+data);
+		msg.media="";
+		 //$window.location.reload();
+		$state.go("tab.feed");
+		}).error(function(){
+		console.log("msg did not go thru");
+		$scope.user = null;
+		});  
+		
+	  
+	  
+	  }
+		
+		
 		 function send(coords)
       {
 	  
@@ -495,8 +649,24 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 	  	console.log("insend1");
 		console.log($scope.usrcoord);
 		console.log($scope.usrcoord.usrlat);
+		if(($scope.usrcoord.usrlat == '') || ($scope.usrcoord.usrlat == '')){
+		
+			$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
+			$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
+			
+			
+			
+		}
 		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', $scope.usrcoord).success(function(result){
 		console.log("good12"+result.data[1]);
+		
+		for(var i=0;i<result.data.length;i++)
+		{
+		
+		$scope.datalist.push(result.data[i]);
+		
+		
+		}
 		
 		console.log(result.data+"dwq");
 		$scope.feedat=result.data;
@@ -515,7 +685,7 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 	  
 	  };
 	  
-	
+			 });
 	  
 	  
 	   
@@ -526,6 +696,8 @@ app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatfor
 app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout,$window) {
 	
 	$scope.auth = auth;
+	
+
   $scope.logout=function ()
  {
 	console.log('removed');
@@ -535,10 +707,35 @@ app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout
     store.remove('refreshToken');
    
 	$window.location.reload();
+	
+	
+	
   
   
 
 };
+
+
+$scope.inbox= function () {
+		$scope.inboxlist=[];
+		var userprofile={};
+		userprofile.username=$scope.auth.profile.email;
+		console.log(userprofile.username+"inbox user");
+		$http.post('http://thawing-cliffs-9435.herokuapp.com/inboxfeed',userprofile).success(function(result){
+			  
+			 for(var i=0;i<result.data1.inbox.length;i++)
+			 {
+		
+			   $scope.inboxlist.push(result.data1.inbox[i]);
+			 }
+			   })
+			   
+			   
+			   }
+			   
+			   	$scope.inbox();
+
+
  $state.go('tab.login', {}, {reload: true});
 
  });

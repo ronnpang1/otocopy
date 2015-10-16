@@ -2,18 +2,48 @@
   <ion-content has-header="true" has-tabs="true" padding="true" overflow-scroll = true" >
 
 
-<body ng-controller="feedCtrl">
+<body ng-controller="starter.feedCtrl">
 
 <ion-refresher
     pulling-text="Pull to refresh..."
     on-refresh="refresh()">
   </ion-refresher>
+  
+  <script id="modalinbox.html" type="text/ng-template">
+	 <body ng-controller="feedCtrl">
+      <div class="modal">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">text</h1>
+          <div class="button button-clear" ng-click="closeModal(1)"><span class="icon ion-close"></span></div>
+        </header>
+        <content has-header="true" padding="true">
+          
+		  <h1>dwqdq</h1>
+		     <form name="comments"  id="comments" novalidate>
 
+  <div class="item item-input">
+  <span class="input-label">input  
+  </span>
+
+   <div class="item item-input" >
+    <textarea placeholder="Comments" name="textarea" cols="15" rows="1" ng-model="user.msg" > </textarea>
+  </div>
+  
+ 
+  &nbsp;
+  &nbsp;
+   <button class="button button-outline button-positive" ng-click="sendinboxmsg(user)">
+Send
+</button>
+  </div>
+  </div>
+</body>
+</script>
   
 
-<div class="list card" ng-repeat="item in datalist | orderBy:'-timestamp'">
+<div class="list card"  ng-repeat="item in datalist | orderBy:'-timestamp'">
 
-  <div class="item item-avatar">
+  <div class="item item-avatar" id="{{item._id}}">
     <img src="img/ionic.png">
     <h2>{{item.user}}</h2>
     <p>July,2 2015</p>
@@ -41,9 +71,35 @@
   
 	
     <p>
-      <a href="#" class="subdued">{{item.upvote}} Like</a>
       <a href="#" class="subdued">{{item.downvote}} Disike</a>
-      <a href="#" class="subdued">5 Comments</a>
+	  <a href="#"  ng-click="showDetails = ! showDetails" class="subdued">{{item.comments.length}} comments </a>
+	  	  <div class="show-reply"  ng-show="showDetails">
+		  <div class="list"  ng-repeat="item in item.comments">
+		   <a class="item item-icon-left" href="#">
+    <i class="ion-android-person" ng-click="showinbox = ! showinbox" >
+		  	 
+			Posted BY: {{item.user}}
+		  
+		   
+		   </i>
+		   
+		 <button class="button button-outline button-assertive"  ng-click="openModal(item.user)"type = "submit">
+		Message
+</button>
+		   	  	 
+
+		  <br>
+		  <br>
+		  {{item.text}}
+		  </div>
+<form name="comments"  id="comments" novalidate>		  
+		 <textarea class="replybox" ng-model="user.reply" style="border:solid 1px orange" placeholder="Comments" name="textarea" cols="15" rows="1" > </textarea>
+		<div ng-model="user.postid" ng-init="user.postid= item._id">{{item._id}}</div>
+		 </form>
+		  <button class="button button-balanced"  ng-click="reply(user,item._id,comments)"type = "submit">
+  reply
+</button>
+</div>
     </p>
   </div>
 
