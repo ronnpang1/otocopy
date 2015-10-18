@@ -2,6 +2,38 @@
 <body ng-controller="ProfileCtrl">
   <ion-content has-header="true" has-tabs="true" padding="true">
     <!-- Login is loadede by auth0-angular -->
+	
+	  <script id="modalinbox.html" type="text/ng-template">
+	 <body ng-controller="ProfileCtrl">
+      <div class="modal">
+        <header class="bar bar-header bar-positive">
+          <h1 class="title">text</h1>
+          <div class="button button-clear" ng-click="closeModal(1)"><span class="icon ion-close"></span></div>
+        </header>
+        <content has-header="true" padding="true">
+          
+		  <h1>dwqdq</h1>
+		     <form name="comments"  id="comments" novalidate>
+
+  <div class="item item-input">
+  <span class="input-label">input  
+  </span>
+
+   <div class="item item-input" >
+    <textarea placeholder="Comments" name="textarea" cols="15" rows="1" ng-model="user.msg" > </textarea>
+  </div>
+  
+ 
+  &nbsp;
+  &nbsp;
+   <button class="button button-outline button-positive" ng-click="sendinboxmsg(user, form)">
+Send
+</button>
+</div>
+</body>
+</script>
+	
+	
     <p><span>Email1: {{auth.profile.email}}</span>
 	<br>
 	<br>
@@ -20,7 +52,19 @@
     <a class="item item-avatar" href="#">
       <img src="img/ionic.png">
       <h2>{{item.sender}}</h2>
+	  &nbsp;
+	  &nbsp;
+	  &nbsp;
+	  &nbsp;
+	  &nbsp;
+	  
+	  <button class="button button-assertive" ng-click="openModal(item.sender)">
+  reply
+</button>
+	  
       <p>{{item.msg}}</p>
+	  
+	 
     </a>
 
     ...

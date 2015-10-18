@@ -144,7 +144,7 @@ angular.module('starter', ['ionic', 'starter.services', 'starter.controllers','a
       views: {
         'tab-feed': {
           templateUrl: 'templates/feed.html',
-          controller: 'feedCtrl'
+          controller: 'FeedCtrl'
         }
       }
     });

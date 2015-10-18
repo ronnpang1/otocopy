@@ -1,10 +1,10 @@
-var app = angular.module('starter.controllers', ["leaflet-directive","ngFileUpload","ionic"]);
+angular.module('starter.controllers', ["leaflet-directive","ngFileUpload","ionic"]);
 
 
 // FUCK
 //controllers for states
 //most of the controllers have already been binded dynamically in app.js
-  app.controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile','$ionicModal','geoLocation',
+  angular.module('starter.controllers').controller("MapIndexCtrl", [ "$scope", "leafletData",'$geolocation','$http','$state', '$stateParams','$window','auth','Camera','Upload','video','$compile','$ionicModal','geoLocation',
   
   
   
@@ -466,7 +466,7 @@ $scope.map.center.lat=geoLocation.getGeolocation().lat;
 	   ]);
 
 // A simple controller that shows a tapped item's data
-app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
+angular.module('starter.controllers').controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
   // "Pets" is a service returning mock data (services.js)
   $scope.pet = PetService.get($stateParams.petId);
   
@@ -476,275 +476,10 @@ app.controller('PetDetailCtrl', function($scope, $stateParams, PetService) {
 
 
 
-app.controller('feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams','auth','$ionicModal','geoLocation',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams,auth,$ionicModal,geoLocation) {
-			 
-			 ionic.Platform.ready(function() {
-			$scope.usrcoord={};
-		$scope.usrcoord.lat='';
-		$scope.usrcoord.lng='';
-			$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
-			$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
-		
-			  
-		$scope.auth=auth;
-		$scope.usrcoord={};
-		
-		$scope.inboxlist=[];
-	 $ionicModal.fromTemplateUrl('modalinbox.html', function($ionicModal) {
-		  id:2;
-        $scope.modalinbox = $ionicModal;
-    }, {
-        // Use our scope for the scope of the modal to keep it simple
-        scope: $scope,
-        // The animation we want to use for the modal entrance
-        animation: 'slide-in-up'
-    });  
-	
-	
-	 
-			 $scope.openModal = function(user)
-			 {
-				  $scope.inbox=user;
-				  $scope.modalinbox.show();
-				 
-			 }
-			 
-			 $scope.sendinboxmsg= function(user,form)
-			 {
-				 
-				 var inbxmsg={};
-				 inbxmsg.sender=$scope.auth.profile.email;
-				 inbxmsg.receiver=$scope.inbox;
-				 inbxmsg.msg=user.msg;
-				 
-				 console.log(inbxmsg.sender);
-				 console.log(inbxmsg.receiver);
-				 console.log(inbxmsg.msg);
-
-				 //inbxmsg.msg=msg;
-				 
-				 $http.post('https://thawing-cliffs-9435.herokuapp.com/inbox', inbxmsg).success(function(data){
-		console.log("good"+data);
-		
-		 //$window.location.reload();
-		$state.go("tab.feed");
-		}).error(function(){
-		console.log("msg did not go thru");
-		$scope.user = null;
-		});  
-		
-		
-				 
-				 
-			 }
-		
-		
-		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
-		
-		$scope.msg=[];
-		$scope.user=[];
-		
-		console.log("feedctrltest");
-		
-		   navigator.geolocation.getCurrentPosition(function(position) {
-				 console.log(position.coords.latitude);
-				  
-				   
-        }, function(error) {
-          alert('Unable to get location: ' + error.message);
-        });
-		
-		
-		var posOptions = {timeout: 10000, enableHighAccuracy: false ,  maximumAge: 90000};
-		console.log("feedctrltest1");
-		$cordovaGeolocation.getCurrentPosition(posOptions)
-			.then(function (position) {
-				   console.log("in geolocation");
-				   console.log("pie?");
-				   console.log(position.coords.latitude);
-				   coords = {};
-				   coords.lat=position.coords.latitude;
-				   coords.lng=position.coords.longitude;
-				   console.log(position+"test");
-				   $scope.usrcoord.lat=position.coords.latitude;;
-				   $scope.usrcoord.lng=position.coords.longitude;
-				   send(coords);
-				   
-				   
-				   
-			   },function(err){
-			   console.log("cant parse");
-			   console.log(err.message);
-			   coords = {};
-			   coords.lat=45.4956033;
-			   coords.lng=-73.57916300000001;
-			   send(coords);
-			   
-			     
-			   
-			   });
-			   console.log("gap");
-			   
-
-			   
-$scope.reply =function (user,id,form)
-      {
-		
-		var msg={};
-		msg.text=user.reply;
-		msg.poster=$scope.auth.profile.email;
-		msg.id=id;
-		console.log(msg.text);
-		console.log(msg.poster);
-		console.log(msg.id);
-		
-		
-	  
-	  $http.post('https://thawing-cliffs-9435.herokuapp.com/reply', msg).success(function(data){
-		console.log("good"+data);
-		msg.media="";
-		 //$window.location.reload();
-		$state.go("tab.feed");
-		}).error(function(){
-		console.log("msg did not go thru");
-		$scope.user = null;
-		});  
-		
-	  
-	  
-	  }
-		
-		
-		 function send(coords)
-      {
-	  
-	  
-		console.log("insend");
-		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', coords).success(function(result){
-		
-				console.log("results:"+result);
-
-		console.log(result.data+"dwq");
-		$scope.feedat=result.data;
-		$scope.datalist=[];
-		for(var i=0;i<result.data.length;i++)
-		{
-		
-		$scope.datalist.push(result.data[i]);
-		
-		
-		}
-		
-		console.log($scope.datalist);
-		console.log(result.data.length + "obj2");
-	  
-		}).error(function(error){
-		console.log("well shit");
-		console.log(error );
-		});  
-		  
-	  }
-	  
-	  $scope.refresh = function () {
-	  	console.log("insend1");
-		console.log($scope.usrcoord);
-		console.log($scope.usrcoord.usrlat);
-		if(($scope.usrcoord.usrlat == '') || ($scope.usrcoord.usrlat == '')){
-		
-			$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
-			$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
-			
-			
-			
-		}
-		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', $scope.usrcoord).success(function(result){
-		console.log("good12"+result.data[1]);
-		
-		for(var i=0;i<result.data.length;i++)
-		{
-		
-		$scope.datalist.push(result.data[i]);
-		
-		
-		}
-		
-		console.log(result.data+"dwq");
-		$scope.feedat=result.data;
-		console.log(result.data.length + "obj2");
-	  
-		}).error(function(){
-		console.log("well shit");
-		
-		})
-		
-		.finally(function() {
-       // Stop the ion-refresher from spinning
-       $scope.$broadcast('scroll.refreshComplete');
-     });
-	  
-	  
-	  };
-	  
-			 });
-	  
-	  
-	   
-			   
-  
-}]);
-
-app.controller('ProfileCtrl',function($scope, auth, $state, store,$http,$timeout,$window) {
-	
-	$scope.auth = auth;
-	
-
-  $scope.logout=function ()
- {
-	console.log('removed');
-    auth.signout();
-    store.remove('token');
-    store.remove('profile');
-    store.remove('refreshToken');
-   
-	$window.location.reload();
-	
-	
-	
-  
-  
-
-};
-
-
-$scope.inbox= function () {
-		$scope.inboxlist=[];
-		var userprofile={};
-		userprofile.username=$scope.auth.profile.email;
-		console.log(userprofile.username+"inbox user");
-		$http.post('http://thawing-cliffs-9435.herokuapp.com/inboxfeed',userprofile).success(function(result){
-			  
-			 for(var i=0;i<result.data1.inbox.length;i++)
-			 {
-		
-			   $scope.inboxlist.push(result.data1.inbox[i]);
-			 }
-			   })
-			   
-			   
-			   }
-			   
-			   	$scope.inbox();
-
-
- $state.go('tab.login', {}, {reload: true});
-
- });
- 
- 
 
 
 
-app.controller('LoginCtrl', function($scope, auth, $state, store, $http, $stateParams, $window) {
+angular.module('starter.controllers').controller('LoginCtrl', function($scope, auth, $state, store, $http, $stateParams, $window) {
 
   function doAuth() {
     auth.signin({

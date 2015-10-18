@@ -1,27 +1,76 @@
-angular.module('starter.controllers').controller('starter.feedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams','auth','$ionicModal',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams,auth,$ionicModal) {
+
+
+
+
+
+angular.module('starter.controllers').controller('FeedCtrl',["$scope",'$http','$cordovaGeolocation','$ionicPlatform','$state','$stateParams','auth','$ionicModal','geoLocation',function($scope, $http, $cordovaGeolocation,$ionicPlatform,$state, $stateParams,auth,$ionicModal,geoLocation) {
 			 
-			  
-		$scope.auth=auth;
+		ionic.Platform.ready(function() {
 		$scope.usrcoord={};
 		$scope.usrcoord.lat='';
 		$scope.usrcoord.lng='';
+		$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
+		$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
+		console.log($scope.usrcoord.lat);
+		console.log($scope.usrcoord.lng);
+			  
+		$scope.auth=auth;
+		$scope.usrcoord={};
 		
-		
-		
-		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
-		
-		$scope.msg=[];
-		$scope.user=[];
-		
-		$ionicModal.fromTemplateUrl('modal.html', function($ionicModal) {
-		   id:1;
-        $scope.modaltext = $ionicModal;
+		$scope.inboxlist=[];
+	 $ionicModal.fromTemplateUrl('modalinbox.html', function($ionicModal) {
+		  id:2;
+        $scope.modalinbox = $ionicModal;
     }, {
         // Use our scope for the scope of the modal to keep it simple
         scope: $scope,
         // The animation we want to use for the modal entrance
         animation: 'slide-in-up'
     });  
+	
+	
+	 
+			 $scope.openModal = function(user)
+			 {
+				  $scope.inbox=user;
+				  $scope.modalinbox.show();
+				 
+			 }
+			 
+			 $scope.sendinboxmsg= function(user,form)
+			 {
+				 
+				 var inbxmsg={};
+				 inbxmsg.sender=$scope.auth.profile.email;
+				 inbxmsg.receiver=$scope.inbox;
+				 inbxmsg.msg=user.msg;
+				 
+				 console.log(inbxmsg.sender);
+				 console.log(inbxmsg.receiver);
+				 console.log(inbxmsg.msg);
+
+				 //inbxmsg.msg=msg;
+				 
+				 $http.post('https://thawing-cliffs-9435.herokuapp.com/inbox', inbxmsg).success(function(data){
+		console.log("good"+data);
+		
+		 //$window.location.reload();
+		$state.go("tab.feed");
+		}).error(function(){
+		console.log("msg did not go thru");
+		$scope.user = null;
+		});  
+		
+		
+				 
+				 
+			 }
+		
+		
+		$scope.item= [{name:"name1"},{name:"name2"},{name:"name3"},{name:"name3"}];
+		
+		$scope.msg=[];
+		$scope.user=[];
 		
 		console.log("feedctrltest");
 		
@@ -34,35 +83,9 @@ angular.module('starter.controllers').controller('starter.feedCtrl',["$scope",'$
         });
 		
 		
-		var posOptions = {timeout: 10000, enableHighAccuracy: false ,  maximumAge: 90000};
-		console.log("feedctrltest1");
-		$cordovaGeolocation.getCurrentPosition(posOptions)
-			.then(function (position) {
-				   console.log("in geolocation");
-				   console.log("pie?");
-				   console.log(position.coords.latitude);
-				   coords = {};
-				   coords.lat=position.coords.latitude;
-				   coords.lng=position.coords.longitude;
-				   console.log(position+"test");
-				   $scope.usrcoord.lat=position.coords.latitude;;
-				   $scope.usrcoord.lng=position.coords.longitude;
-				   send(coords);
-				   
-				   
-				   
-			   },function(err){
-			   console.log("cant parse");
-			   console.log(err.message);
-			   coords = {};
-			   coords.lat=45.4956033;
-			   coords.lng=-73.57916300000001;
-			   send(coords);
+
 			   
-			     
-			   
-			   });
-			   console.log("gap");
+
 			   
 $scope.reply =function (user,id,form)
       {
@@ -123,9 +146,14 @@ $scope.reply =function (user,id,form)
 	  }
 	  
 	  $scope.refresh = function () {
+		  $scope.datalist=[];
 	  	console.log("insend1");
 		console.log($scope.usrcoord);
 		console.log($scope.usrcoord.usrlat);
+		
+			$scope.usrcoord.lat=geoLocation.getGeolocation().lat;
+			$scope.usrcoord.lng=geoLocation.getGeolocation().lng;
+		
 		$http.post('http://thawing-cliffs-9435.herokuapp.com/feed', $scope.usrcoord).success(function(result){
 		console.log("good12"+result.data[1]);
 		
@@ -154,13 +182,10 @@ $scope.reply =function (user,id,form)
 	  
 	  };
 	  
-	
+			 });
 	  
 	  
 	   
 			   
   
 }]);
-
-
- 
